@@ -19,7 +19,7 @@ def hook(settings, src_dict, trg_dict, file_list, **kwargs):
         settings.trg_dict = trg_dict
         settings.slots = [
             integer_value_sequence(len(settings.src_dict)),
-            dense_vector_sequence(len(settings.trg_dict)),
+            dense_vector_sequence(len(settings.src_dict)),
             integer_value_sequence(len(settings.trg_dict)),
             integer_value_sequence(len(settings.trg_dict)),
         ]
