@@ -59,7 +59,7 @@ def gru_encoder_decoder(data_conf,
     src_embedding_wtf = embedding_layer(
         input=wtf,
         size=word_vector_dim,
-        param_attr=ParamAttr(name='_source_language_embedding'))
+        param_attr=ParamAttr(name='_source_language_embedding_wtfs'))
     src_forward_wtf = simple_gru(input=src_embedding_wtf, size=encoder_size)
     src_backward_wtf = simple_gru(input=src_embedding_wtf, size=encoder_size, reverse=True)
     encoded_wtf_vec = concat_layer(input=[src_forward_wtf, src_backward_wtf])
