@@ -45,25 +45,22 @@ def gru_encoder_decoder(data_conf,
         decoder_size = decoder_size / 3 * 3
 
     src_word_id = data_layer(name='source_language_word', size=source_dict_dim)
-    src_embedding = embedding_layer(
-        input=src_word_id,
-        size=word_vector_dim,
-        param_attr=ParamAttr(name='_source_language_embedding'))
+    #src_embedding = embedding_layer(
+    #    input=src_word_id,
+    #    size=word_vector_dim,
+    #    param_attr=ParamAttr(name='_source_language_embedding'))
+    src_embedding = fc_layer(input=src_word_id, size=word_vector_dim)   
     src_forward = simple_gru(input=src_embedding, size=encoder_size)
     src_backward = simple_gru(input=src_embedding, size=encoder_size, reverse=True)
     encoded_vector = concat_layer(input=[src_forward, src_backward])
     with mixed_layer(size=decoder_size) as encoded_proj:
         encoded_proj += full_matrix_projection(input=encoded_vector)
 
-    wtf = data_layer(name='wtf', size=source_dict_dim)
-    encoded_wtf_vec = fc_layer(input=wtf, size=encoder_size)
-    with mixed_layer(size=decoder_size) as encoded_wtf_proj:
-        encoded_wtf_proj += full_matrix_projection(input=encoded_wtf_vec)
-
     backward_first = first_seq(input=src_backward)
     with mixed_layer(size=decoder_size,
                      act=TanhActivation(), ) as decoder_boot:
         decoder_boot += full_matrix_projection(input=backward_first)
+
 
     def gru_decoder_with_attention(enc_vec, enc_proj, current_word):
         decoder_mem = memory(name='gru_decoder',
@@ -106,18 +103,10 @@ def gru_encoder_decoder(data_conf,
                                   step=gru_decoder_with_attention,
                                   input=group_inputs)
 
-        group_wtf = [StaticInput(input=encoded_wtf_vec, is_seq=True),
-                     StaticInput(input=encoded_wtf_proj, is_seq=True),
-                     trg_embedding]
-
-        decoder_wtf = recurrent_group(name="decoder_group_wtf",
-                                      step=gru_decoder_with_attention,
-                                      input=group_wtf)
 
         lbl = data_layer(name='target_language_next_word',
                          size=target_dict_dim)
         cost = classification_cost(input=decoder, label=lbl)
-        cost = classification_cost(input=decoder_wtf, label=lbl)
 
         outputs(cost)
     else:

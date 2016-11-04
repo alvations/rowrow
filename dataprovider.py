@@ -18,7 +18,7 @@ def hook(settings, src_dict, trg_dict, file_list, **kwargs):
     if settings.job_mode:
         settings.trg_dict = trg_dict
         settings.slots = [
-            integer_value_sequence(len(settings.src_dict)),
+            #integer_value_sequence(len(settings.src_dict)),
             dense_vector_sequence(len(settings.src_dict)),
             integer_value_sequence(len(settings.trg_dict)),
             integer_value_sequence(len(settings.trg_dict)),
@@ -62,7 +62,7 @@ def process(settings, file_name):
                 trg_ids_next = trg_ids + [settings.trg_dict[END]]
                 trg_ids = [settings.trg_dict[START]] + trg_ids
                 _wtf = thematrix[src_ids].tolist()
-                yield src_ids, _wtf, trg_ids, trg_ids_next
-                #yield src_ids, trg_ids, trg_ids_next
+                #yield src_ids, _wtf, trg_ids, trg_ids_next
+                yield _wtf, trg_ids, trg_ids_next
             else:
                 yield src_ids, [line_count]
