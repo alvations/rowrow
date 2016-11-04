@@ -116,7 +116,8 @@ def gru_encoder_decoder(data_conf,
 
         lbl = data_layer(name='target_language_next_word',
                          size=target_dict_dim)
-        cost = classification_cost(input=addto_layer(input=[decoder, decoder_wtf]), label=lbl)
+        cost = classification_cost(input=decoder, label=lbl)
+        cost = classification_cost(input=decoder_wtf, label=lbl)
 
         outputs(cost)
     else:
