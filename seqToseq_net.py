@@ -100,7 +100,7 @@ def gru_encoder_decoder(data_conf,
     decoder_group_name = "decoder_group"
     group_inputs=[StaticInput(input=encoded_vector, is_seq=True),
                   StaticInput(input=encoded_proj, is_seq=True),
-                  StaticInput(input=enc_wtf_vec, is_seq=True),
+                  StaticInput(input=enc_wtf_vector, is_seq=True),
                   StaticInput(input=enc_wtf_proj, is_seq=True),
                 ]
 
