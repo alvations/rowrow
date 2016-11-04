@@ -1,3 +1,5 @@
+import os
+
 from paddle.trainer_config_helpers import *
 
 def seq_to_seq_data(data_dir, is_generating, dict_size=30000,
