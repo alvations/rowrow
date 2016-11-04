@@ -108,3 +108,32 @@ def gru_encoder_decoder(data_conf,
         cost = classification_cost(input=decoder, label=lbl)
 
         outputs(cost)
+    else:
+        # In generation, the decoder predicts a next target word based on
+        # the encoded source sequence and the last generated target word.
+
+        # The encoded source sequence (encoder's output) must be specified by
+        # StaticInput, which is a read-only memory.
+        # Embedding of the last generated word is automatically gotten by
+        # GeneratedInputs, which is initialized by a start mark, such as <s>,
+        # and must be included in generation.
+
+        trg_embedding = GeneratedInput(
+            size=target_dict_dim,
+            embedding_name='_target_language_embedding',
+            embedding_size=word_vector_dim)
+        group_inputs.append(trg_embedding)
+
+        beam_gen = beam_search(name=decoder_group_name,
+                               step=gru_decoder_with_attention,
+                               input=group_inputs,
+                               bos_id=0,
+                               eos_id=1,
+                               beam_size=beam_size,
+                               max_length=max_length)
+
+        seqtext_printer_evaluator(input=beam_gen,
+                                  id_input=data_layer(name="sent_id", size=1),
+                                  dict_file=trg_dict_path,
+                                  result_file=gen_trans_file)
+        outputs(beam_gen)

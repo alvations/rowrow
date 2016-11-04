@@ -21,6 +21,13 @@ def hook(settings, src_dict, trg_dict, file_list, **kwargs):
             integer_value_sequence(len(settings.trg_dict)),
         ]
         settings.logger.info("trg dict len : %d" % (len(settings.trg_dict)))
+    else:
+        settings.slots = [
+            integer_value_sequence(len(settings.src_dict)),
+            integer_value_sequence(len(open(file_list[0], "r").readlines()))
+        ]
+
+
 
 def _get_ids(s, dictionary):
     words = s.strip().split()
