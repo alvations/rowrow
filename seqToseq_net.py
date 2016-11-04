@@ -63,12 +63,12 @@ def gru_encoder_decoder(data_conf,
     src_backward_wtf = simple_gru(input=src_embedding,
                               size=encoder_size,
                               reverse=True)
-    encoded_wtf_vec = concat_layer(input=[src_forward, src_backward])
+    encoded_wtf_vec = concat_layer(input=[src_forward_wtf, src_backward_wtf])
 
     with mixed_layer(size=decoder_size) as encoded_wtf:
         encoded_wtf_proj += full_matrix_projection(input=encoded_wtf_vec)
 
-    backward_first = first_seq(input=[src_backward, src_backward_wtf])
+    backward_first = first_seq(input=src_backward)
     with mixed_layer(size=decoder_size,
                      act=TanhActivation(), ) as decoder_boot:
         decoder_boot += full_matrix_projection(input=backward_first)
