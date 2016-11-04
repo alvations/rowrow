@@ -65,7 +65,7 @@ def gru_encoder_decoder(data_conf,
                      act=TanhActivation(), ) as decoder_boot:
         decoder_boot += full_matrix_projection(input=backward_first)
 
-    def gru_decoder_with_attention(enc_vec, enc_proj, enc_wtf_vec, enc_wtf_proj, current_word):
+    def gru_decoder_with_attention(enc_vec, enc_proj, current_word):
         decoder_mem = memory(name='gru_decoder',
                              size=decoder_size,
                              boot_layer=decoder_boot)
@@ -74,15 +74,8 @@ def gru_encoder_decoder(data_conf,
                                    encoded_proj=enc_proj,
                                    decoder_state=decoder_mem, )
 
-
-        context2 = simple_attention(encoded_sequence=enc_wtf_vec,
-                                   encoded_proj=enc_wtf_proj,
-                                   decoder_state=decoder_mem, )
-
-
         with mixed_layer(size=decoder_size * 3) as decoder_inputs:
             decoder_inputs += full_matrix_projection(input=context)
-            decoder_inputs += full_matrix_projection(input=context2)
             decoder_inputs += full_matrix_projection(input=current_word)
 
 
@@ -99,10 +92,7 @@ def gru_encoder_decoder(data_conf,
 
     decoder_group_name = "decoder_group"
     group_inputs=[StaticInput(input=encoded_vector, is_seq=True),
-                  StaticInput(input=encoded_proj, is_seq=True),
-                  StaticInput(input=encoded_wtf_vec, is_seq=True),
-                  StaticInput(input=encoded_wtf_proj, is_seq=True),
-                ]
+                  StaticInput(input=encoded_proj, is_seq=True)]
 
     if not is_generating:
         trg_embedding = embedding_layer(
@@ -116,9 +106,17 @@ def gru_encoder_decoder(data_conf,
                                   step=gru_decoder_with_attention,
                                   input=group_inputs)
 
+        group_wtf = [StaticInput(input=encoded_vector_wtf, is_seq=True),
+                     StaticInput(input=encoded_proj_wtf, is_seq=True),
+                     trg_embedding]
+
+        decoder_wtf = recurrent_group(name="decoder_group_wtf",
+                                      step=gru_decoder_with_attention,
+                                      input=group_wtf)
+
         lbl = data_layer(name='target_language_next_word',
                          size=target_dict_dim)
-        cost = classification_cost(input=decoder, label=lbl)
+        cost = classification_cost(input=addto_layer(input=[decoder, decoder_wtf], label=lbl)
 
         outputs(cost)
     else:
