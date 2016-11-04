@@ -1,6 +1,6 @@
 set -e
 
-PATH_TO_MODEL=/home/ltan/rowrow/model
+PATH_TO_MODEL=/home/ltan/Paddle/demo/rowrow/model
 
 paddle train \
     --job=test \
