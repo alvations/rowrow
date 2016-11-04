@@ -1,5 +1,7 @@
 from paddle.trainer.PyDataProvider2 import *
 
+import numpy as np
+
 UNK_IDX = 2
 START = "<s>"
 END = "<e>"
@@ -17,6 +19,7 @@ def hook(settings, src_dict, trg_dict, file_list, **kwargs):
         settings.trg_dict = trg_dict
         settings.slots = [
             integer_value_sequence(len(settings.src_dict)),
+            dense_vector_sequence(len(settings.trg_dict)),
             integer_value_sequence(len(settings.trg_dict)),
             integer_value_sequence(len(settings.trg_dict)),
         ]
@@ -38,6 +41,7 @@ def _get_ids(s, dictionary):
 
 @provider(init_hook=hook, pool_size=50000)
 def process(settings, file_name):
+    thematrix = np.random.rand(len(settings.src_dict), len(settings.trg_dict))
     with open(file_name, 'r') as f:
         for line_count, line in enumerate(f):
             line_split = line.strip().split('\t')
@@ -57,6 +61,8 @@ def process(settings, file_name):
                     continue
                 trg_ids_next = trg_ids + [settings.trg_dict[END]]
                 trg_ids = [settings.trg_dict[START]] + trg_ids
-                yield src_ids, trg_ids, trg_ids_next
+                _wtf = thematrix[src_ids].tolist()
+                yield src_ids, _wtf, trg_ids, trg_ids_next
+                #yield src_ids, trg_ids, trg_ids_next
             else:
                 yield src_ids, [line_count]
