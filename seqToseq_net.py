@@ -5,8 +5,8 @@ def seq_to_seq_data(data_dir, is_generating, dict_size=30000,
                     gen_result='test_output'):
     train_list, test_list, gen_list = map(lambda x: x+'.list', subdir_structure)
 
-    src_lang_dict = os.path.join(data_dir, 'src.dict')
-    trg_lang_dict = os.path.join(data_dir, 'trg.dict')
+    src_lang_dict = os.path.join(data_dir, 'words.dict')
+    trg_lang_dict = os.path.join(data_dir, 'tags.dict')
     with open(src_lang_dict, "r") as fin:
         src_dict = {word.strip():_id for _id, word in enumerate(fin)}
     with open(trg_lang_dict, "r") as fin:
