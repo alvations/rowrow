@@ -14,7 +14,7 @@ def hook(settings, src_dict, trg_dict, file_list, **kwargs):
     settings.src_dict = src_dict
     settings.logger.info("src dict len : %d" % (len(settings.src_dict)))
     settings.sample_count = 0
-
+    settings.thematrix = np.random.rand(len(src_dict), len(trg_dict))
     if settings.job_mode:
         settings.trg_dict = trg_dict
         settings.slots = [
@@ -41,7 +41,6 @@ def _get_ids(s, dictionary):
 
 @provider(init_hook=hook, pool_size=50000)
 def process(settings, file_name):
-    thematrix = np.random.rand(len(settings.src_dict), len(settings.trg_dict))
     with open(file_name, 'r') as f:
         for line_count, line in enumerate(f):
             line_split = line.strip().split('\t')
@@ -61,8 +60,9 @@ def process(settings, file_name):
                     continue
                 trg_ids_next = trg_ids + [settings.trg_dict[END]]
                 trg_ids = [settings.trg_dict[START]] + trg_ids
-                _wtf = thematrix[src_ids].tolist()
+                _wtf = settings.thematrix[src_ids]
                 #yield src_ids, _wtf, trg_ids, trg_ids_next
+                print line_count#, len(_wtf)
                 yield _wtf, trg_ids, trg_ids_next
             else:
                 yield src_ids, [line_count]
