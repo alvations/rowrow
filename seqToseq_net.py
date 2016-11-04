@@ -75,7 +75,7 @@ def gru_encoder_decoder(data_conf,
                                    decoder_state=decoder_mem, )
 
 
-        context = simple_attention(encoded_sequence=enc_wtf_vec,
+        context2 = simple_attention(encoded_sequence=enc_wtf_vec,
                                    encoded_proj=enc_wtf_proj,
                                    decoder_state=decoder_mem, )
 
