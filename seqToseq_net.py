@@ -56,10 +56,10 @@ def gru_encoder_decoder(data_conf,
     encoded_vector = concat_layer(input=[src_forward, src_backward])
 
     wtf = data_layer(name='wtf', size=source_dict_dim)
-    wtf = fc_layer(input=wtf, size=encoder_size)
+    encoded_wtf_vec = simple_gru(input=wtf, size=encoder_size)
 
     with mixed_layer(size=decoder_size) as encoded_wtf:
-        encoded_wtf += full_matrix_projection(input=wtf)
+        encoded_wtf_proj += full_matrix_projection(input=wtf)
 
     with mixed_layer(size=decoder_size) as encoded_proj:
         encoded_proj += full_matrix_projection(input=encoded_vector)
@@ -69,7 +69,7 @@ def gru_encoder_decoder(data_conf,
                      act=TanhActivation(), ) as decoder_boot:
         decoder_boot += full_matrix_projection(input=backward_first)
 
-    def gru_decoder_with_attention(enc_vec, enc_proj, enc_wtf, current_word):
+    def gru_decoder_with_attention(enc_vec, enc_proj, enc_wtf_vec, enc_wtf_proj, current_word):
         decoder_mem = memory(name='gru_decoder',
                              size=decoder_size,
                              boot_layer=decoder_boot)
@@ -78,8 +78,8 @@ def gru_encoder_decoder(data_conf,
                                    encoded_proj=enc_proj,
                                    decoder_state=decoder_mem, )
 
-        context2 = simple_attention(encoded_sequence=enc_vec,
-                                   encoded_proj=enc_wtf,
+        context2 = simple_attention(encoded_sequence=enc_wtf_vec,
+                                   encoded_proj=enc_wtf_proj,
                                    decoder_state=decoder_mem, )
 
         with mixed_layer(size=decoder_size * 3) as decoder_inputs:
@@ -100,9 +100,10 @@ def gru_encoder_decoder(data_conf,
         return out
 
     decoder_group_name = "decoder_group"
-    group_inputs=[StaticInput(input=encoded_vector,is_seq=True),
-                  StaticInput(input=encoded_proj,is_seq=True),
-                  StaticInput(input=encoded_wtf, is_seq=True)]
+    group_inputs=[StaticInput(input=encoded_vector, is_seq=True),
+                  StaticInput(input=encoded_proj, is_seq=True),
+                  StaticInput(input=encoded_wtf_vec, is_seq=True)
+                  StaticInput(input=encoded_wtf_proj, is_seq=True)]
 
     if not is_generating:
         trg_embedding = embedding_layer(
