@@ -66,7 +66,7 @@ def gru_encoder_decoder(data_conf,
     encoded_wtf_vec = concat_layer(input=[src_forward, src_backward])
 
     with mixed_layer(size=decoder_size) as encoded_wtf:
-        encoded_wtf_proj += full_matrix_projection(input=wtf)
+        encoded_wtf_proj += full_matrix_projection(input=encoded_wtf_vec)
 
     backward_first = first_seq(input=[src_backward, src_backward_wtf])
     with mixed_layer(size=decoder_size,
