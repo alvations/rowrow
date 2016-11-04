@@ -106,8 +106,8 @@ def gru_encoder_decoder(data_conf,
                                   step=gru_decoder_with_attention,
                                   input=group_inputs)
 
-        group_wtf = [StaticInput(input=encoded_vector_wtf, is_seq=True),
-                     StaticInput(input=encoded_proj_wtf, is_seq=True),
+        group_wtf = [StaticInput(input=encoded_wtf_vec, is_seq=True),
+                     StaticInput(input=encoded_wtf_proj, is_seq=True),
                      trg_embedding]
 
         decoder_wtf = recurrent_group(name="decoder_group_wtf",
