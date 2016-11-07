@@ -60,9 +60,7 @@ def process(settings, file_name):
                     continue
                 trg_ids_next = trg_ids + [settings.trg_dict[END]]
                 trg_ids = [settings.trg_dict[START]] + trg_ids
-                _wtf = settings.thematrix[:,src_ids].transpose().tolist()
-                #yield src_ids, _wtf, trg_ids, trg_ids_next
-                #print line_count#, len(_wtf)
-                yield _wtf, trg_ids, trg_ids_next
+                lexmat = settings.thematrix[:,src_ids].transpose().tolist()
+                yield lexmat, trg_ids, trg_ids_next
             else:
                 yield src_ids, [line_count]
